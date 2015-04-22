@@ -19,7 +19,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 			$data = $data->fetch();
 			
 			
-			$sql="DELETE FROM `socialnetwork`.`friend` WHERE `friend`.`iduser` = ".$IdUser." AND `friend`.`idfriend` = ".$data["iduser"]."  AND `friend_accepted`= 1";
+			$sql="DELETE FROM `socialnetwork`.`friend` WHERE `friend`.`iduser` = ".$IdUser." AND `friend`.`idfriend` = ".$data["iduser"]."";
 			$insert = QueryPDO::getInstance()->query($sql);
 			//-------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
