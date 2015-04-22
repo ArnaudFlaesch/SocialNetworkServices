@@ -13,14 +13,14 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 			//-------------------------------------------------------------------------
 			//------------------------------  CODE ------------------------------------
 			//------Il faut biensur changer les parametres en fonction du besoin-------
+
 			$sql = "SELECT `iduser` FROM `user` WHERE `user_firstname`='".$_POST["firstname"]."' AND `user_name`='".$_POST["lastname"]."';	";
 			$data = QueryPDO::getInstance()->query($sql);
 			$data = $data->fetch();
 			
-
-			$sql="INSERT INTO `socialnetwork`.`friend` (`iduser`, `idfriend`, `friend_accepted`) VALUES ('".$IdUser."', '".$data["iduser"]."', '0');";
+			
+			$sql="UPDATE `socialnetwork`.`friend` SET `friend_accepted` = '1' WHERE `friend`.`iduser` = ".$IdUser." AND `friend`.`idfriend` = ".$data["iduser"].";";
 			$insert = QueryPDO::getInstance()->query($sql);
-		
 			//-------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
 

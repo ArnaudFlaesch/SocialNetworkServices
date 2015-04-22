@@ -60,6 +60,8 @@ class QueryPDO
   {
     $requete = $this->PDOInstance->prepare($query);
     if($requete && $requete->execute()){
+      if($requete->rowCount()==0)
+        return null;
      return $requete;
     }
     else{
