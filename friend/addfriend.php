@@ -16,14 +16,15 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 			$sql = "SELECT `iduser` FROM `user` WHERE `user_firstname`='".$_POST["firstname"]."' AND `user_name`='".$_POST["lastname"]."';	";
 			$data = QueryPDO::getInstance()->query($sql);
 			$data = $data->fetch();
-			echo $data["iduser"];
+			
 
 			$sql="INSERT INTO `socialnetwork`.`friend` (`iduser`, `idfriend`, `friend_accepted`) VALUES ('".$IdUser."', '".$data["iduser"]."', '0');";
-			$Insert = QueryPDO::getInstance()->query($sql);
+			$insert = QueryPDO::getInstance()->query($sql);
+		
 			//-------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
 
-			if(is_null($Insert)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
+			if(is_null($insert)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
 				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 			}
 			else{

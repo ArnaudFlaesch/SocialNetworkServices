@@ -58,7 +58,13 @@ class QueryPDO
 
   public function query($query)
   {
-    return $this->PDOInstance->query($query);
+    $requete = $this->PDOInstance->prepare($query);
+    if($requete && $requete->execute()){
+     return $requete;
+    }
+    else{
+      return null;
+    }
   }
 
   public function getIdByToken($token){
