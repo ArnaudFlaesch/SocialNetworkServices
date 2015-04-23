@@ -60,6 +60,7 @@ class QueryPDO
 
   public function query($query)
   {
+    
     $requete = $this->PDOInstance->prepare($query);
     try{
         if($requete && $requete->execute()){
