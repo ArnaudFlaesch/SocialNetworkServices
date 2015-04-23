@@ -16,15 +16,23 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 
 			$sql = "SELECT `iduser` FROM `user` WHERE `user_firstname`='".$_POST["firstname"]."' AND `user_name`='".$_POST["lastname"]."';	";
 			$data = QueryPDO::getInstance()->query($sql);
-			$data = $data->fetch();
+			if(is_object($data)){
+				echo "object";
+				$data = $data->fetch();
+			}
+			else
+				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 			
 			
 			$sql="DELETE FROM `socialnetwork`.`friend` WHERE `friend`.`iduser` = ".$IdUser." AND `friend`.`idfriend` = ".$data["iduser"]."  AND `friend_accepted`= 1";
 			$insert = QueryPDO::getInstance()->query($sql);
+			$sql="DELETE FROM `socialnetwork`.`friend` WHERE `friend`.`iduser` = ".$data["iduser"]." AND `friend`.`idfriend` = ".$IdUser."  AND `friend_accepted`= 1";
+			$insert2 = QueryPDO::getInstance()->query($sql);
+			
 			//-------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
 
-			if(is_null($insert)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
+			if(is_null($insert)&&is_null($insert2)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
 				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 			}
 			else{

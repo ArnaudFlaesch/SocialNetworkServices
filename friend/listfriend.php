@@ -17,14 +17,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 
 
 			
-					// Connexion à la base de données
-				
-					   
-					 
-					 
-					// Si tout va bien, on peut continuer
-					 
-					$nombre_de_msg_par_page=5; // On met dans une variable le nombre de messages qu'on veut par page
+					$nombre_de_msg_par_page=10; // On met dans une variable le nombre de messages qu'on veut par page
 					 
 					// On récupère le nombre total de messages
 					 
@@ -42,15 +35,15 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					echo 'Page : ';
 					for ($i = 1 ; $i <= $nb_pages ; $i++)
 					{
-					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/listfriend.php?token='.$_GET["token"].'&page=' . $i . '">' . $i . '</a> ';
+					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/listfriend.php?token='.$_GET["token"].'&page=' . $i . '">' . $i . '</a> '; // en dur
 					}
- 
+ 					echo "<br>";
 					// Maintenant, on va afficher les messages
 					// ---------------------------------------
 					 
 					if (isset($_GET['page']))
 					{
-					    $page = $_GET['page']; // On récupère le numéro de la page indiqué dans l'adresse (livredor.php?page=4)
+					    $page = $_GET['page']; // On récupère le numéro de la page indiqué dans l'adresse 
 					}
 					else // La variable n'existe pas, c'est la première fois qu'on charge la page
 					{
@@ -58,27 +51,79 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					}
 					 
 					// On calcule le numéro du premier message qu'on prend pour le LIMIT de MySQL
-					$premierMessageAafficher = ($page - 1) * $nombre_de_msg_par_page;
+					$premierMessageAafficher = ($page - 1) * $nombre_de_msg_par_page/2;
 					 
 					// On ferme la requête avant d'en faire une autre
 					
-					$reponse->closeCursor();
-					$reponse = QueryPDO::getInstance()->query('SELECT * FROM friend ORDER BY iduser DESC LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page);
-					 
-					while($donnees = $reponse->fetch()) 
-					{
-						$jsontab[$donnees['iduser']]=$donnees['idfriend'];
-					    echo '<p><strong>' . stripslashes(htmlspecialchars($donnees['iduser'])) . '</strong> est amis avec :' . stripslashes(htmlspecialchars($donnees['idfriend'])) . '</p>';
+
+
+					//-------------------------------- Pour la pagination -----------------------------------------
+					
+					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
+																INNER JOIN friend AS F ON U.iduser = F.iduser 
+																INNER JOIN user ON user.iduser = F.idfriend 
+																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
+																LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page/2);
+
+					if(is_object($reponse2)){
+						while($donnees = $reponse2->fetch()) 
+							{	
+								
+							    echo 'est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
+							}
+					   
 					}
-					 
-					
-					
+						
+					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
+																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
+																	INNER JOIN user ON user.iduser = F.iduser
+																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
+																	LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page/2
+																);
+					if(is_object($reponse3)){	 
+						while($donnees = $reponse3->fetch()) 
+							{
+								
+							    echo '<p> est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
+							}
+					}
+				
+					//-----------------------------------------------------------------------------------------------
+					//--------------------------------Pour la liste a renvoyer --------------------------------------
+					$jsontab = array();
+					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
+																INNER JOIN friend AS F ON U.iduser = F.iduser 
+																INNER JOIN user ON user.iduser = F.idfriend 
+																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
+																');
 
-
+					if(is_object($reponse2)){
+						while($donnees = $reponse2->fetch()) 
+							{	
+								array_push($jsontab, $donnees['user_login']);
+							  
+							}
+					   
+					}
+						
+					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
+																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
+																	INNER JOIN user ON user.iduser = F.iduser
+																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
+																	'
+																);
+					if(is_object($reponse3)){	 
+						while($donnees = $reponse3->fetch()) 
+							{
+								array_push($jsontab, $donnees['user_login']);
+							   
+							}
+					}
+					//-----------------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
 			//-------------------------------------------------------------------------
 
-			if(is_null($reponse)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
+			if(is_null($reponse2 && $reponse3)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
 				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 			}
 			else{

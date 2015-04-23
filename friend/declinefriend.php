@@ -16,7 +16,10 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 
 			$sql = "SELECT `iduser` FROM `user` WHERE `user_firstname`='".$_POST["firstname"]."' AND `user_name`='".$_POST["lastname"]."';	";
 			$data = QueryPDO::getInstance()->query($sql);
-			$data = $data->fetch();
+			if(is_object($data))
+				$data = $data->fetch();
+			else
+				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 			
 			
 			$sql="UPDATE `socialnetwork`.`friend` SET `friend_accepted` = '-1' WHERE `friend`.`iduser` = ".$IdUser." AND `friend`.`idfriend` = ".$data["iduser"].";";

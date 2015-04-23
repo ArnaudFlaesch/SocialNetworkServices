@@ -37,7 +37,9 @@ class QueryPDO
    */
   private function __construct()
   {
-    $this->PDOInstance = new PDO('mysql:dbname='.self::DEFAULT_SQL_DTB.';host='.self::DEFAULT_SQL_HOST,self::DEFAULT_SQL_USER ,self::DEFAULT_SQL_PASS);    
+    $this->PDOInstance = new PDO('mysql:dbname='.self::DEFAULT_SQL_DTB.';host='.self::DEFAULT_SQL_HOST,self::DEFAULT_SQL_USER ,self::DEFAULT_SQL_PASS);
+    $this->PDOInstance->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $this->PDOInstance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   }
  
    /**
@@ -59,14 +61,19 @@ class QueryPDO
   public function query($query)
   {
     $requete = $this->PDOInstance->prepare($query);
-    if($requete && $requete->execute()){
-      if($requete->rowCount()==0)
-        return null;
-     return $requete;
-    }
-    else{
-      return null;
-    }
+    try{
+        if($requete && $requete->execute()){
+          if($requete->rowCount()==0)
+            return null;
+         return $requete;
+        }
+        else{
+          return null;
+        }
+      }
+   catch(Exception $e){
+    return null;  
+      }
   }
 
   public function getIdByToken($token){
