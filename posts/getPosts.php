@@ -5,12 +5,8 @@
             $bdd = new PDO('mysql:host=localhost;dbname=socialnetwork','root','');
             $requete = $bdd->prepare("SELECT *
                                       FROM post P
-                                      WHERE idUser IN (
-                                                       SELECT idfriend
-                                                       FROM friend
-                                                       WHERE iduser = (SELECT iduser FROM user WHERE user_token = :token)
-                                                       AND friend_accepted = 1
-                                                      )
+                                      WHERE iduser IN (SELECT idfriend FROM friend WHERE iduser = :iduser AND friend_accepted = 1)
+                                      OR iduser IN (SELECT iduser FROM friend WHERE idfriend = :idfriend AND friend_accepted = 1)
                                       OR iduser = :idUser
                                       ORDER BY post_date DESC");
             if ($requete && $requete->execute($tabParams)) {
