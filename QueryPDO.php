@@ -94,7 +94,7 @@ class QueryPDO
 
     public function ServiceReturnJson($code,$msg){
         $Error[] =["code"=>$code,"msg"=>$msg];
-        print_r(json_encode($Error));
-        return json_encode($Error);
+        echo json_encode($Error);
+        return ($Error);
     }
 }

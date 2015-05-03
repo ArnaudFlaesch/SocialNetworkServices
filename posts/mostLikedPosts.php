@@ -7,18 +7,15 @@
             }
             else {
                 $tabParams[':iduser'] = $idUser;
-                $tabParams[':idfriend'] = $idUser;
-                $tabParams[':idutilisateur'] = $idUser;
-                $requete = "SELECT P.idpost, P.post_content , P.post_date, U.user_firstname, U.user_name
-                            FROM post P, socialnetwork.user U
-                            WHERE P.iduser IN (SELECT idfriend FROM friend F WHERE F.iduser = :iduser AND F.friend_accepted = 1)
-                            OR P.iduser IN (SELECT iduser FROM friend F WHERE F.idfriend = :idfriend AND F.friend_accepted = 1)
-                            OR P.iduser = :idutilisateur
-                            AND P.iduser = U.iduser
-                            ORDER BY post_date DESC";
+                $requete = "SELECT P.idpost, P.post_content, P.post_date, COUNT(*) as nombreLike
+                            FROM socialnetwork.like L, post P
+                            WHERE L.idpost IN (SELECT idpost FROM post WHERE iduser = :iduser)
+                            AND L.idpost = P.idpost
+                            GROUP BY L.idpost
+                            ORDER BY nombreLike DESC";
                 $result = QueryPDO::getInstance()->query($requete, $tabParams);
                 if ($result != null) {
-                    $i = 0;
+                    $i = 1;
                     $tabParams = null;
                     while ($ligne = $result->fetch(PDO::FETCH_ASSOC)) {
                         $tabParams[':idpost'] = $ligne['idpost'];
