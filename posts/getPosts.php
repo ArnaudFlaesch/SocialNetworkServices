@@ -6,6 +6,18 @@
                 return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
             }
             else {
+                if (isset($_GET['limit'])) {
+                    $tabParams[':limit'] = $_GET['limit'];
+                }
+                else {
+                    $tabParams[':limit'] = 10;
+                }
+                if (isset($_GET['offset'])) {
+                    $tabParams[':offset'] = $_GET['offset'];
+                }
+                else {
+                    $tabParams[':offset'] = 1;
+                }
                 $tabParams[':iduser'] = $idUser;
                 $tabParams[':idfriend'] = $idUser;
                 $tabParams[':idutilisateur'] = $idUser;
@@ -15,7 +27,8 @@
                             OR P.iduser IN (SELECT iduser FROM friend F WHERE F.idfriend = :idfriend AND F.friend_accepted = 1)
                             OR P.iduser = :idutilisateur
                             AND P.iduser = U.iduser
-                            ORDER BY post_date DESC";
+                            ORDER BY post_date DESC
+                            LIMIT :limit OFFSET :offset";
                 $result = QueryPDO::getInstance()->query($requete, $tabParams);
                 if ($result != null) {
                     $i = 0;

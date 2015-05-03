@@ -1,12 +1,23 @@
 <?php
     require_once("../QueryPDO.php");
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "GET") {
-        $_SESSION['token'] = 1248;
         if (isset($_SESSION['token'])) {
             if(is_null($idUser = QueryPDO::getInstance()->getIdByToken($_SESSION["token"]))) {
                 return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
             }
             else {
+                if (isset($_GET['limit'])) {
+                    $tabParams[':limit'] = $_GET['limit'];
+                }
+                else {
+                    $tabParams[':limit'] = 10;
+                }
+                if (isset($_GET['offset'])) {
+                    $tabParams[':offset'] = $_GET['offset'];
+                }
+                else {
+                    $tabParams[':offset'] = 1;
+                }
                 if (isset($_GET['hashtag'])) {
                     $tabParams[':iduser'] = $idUser;
                     $tabParams[':idfriend'] = $idUser;
@@ -34,7 +45,8 @@
                                 AND ( (P.iduser IN (SELECT idfriend FROM friend WHERE friend.iduser = :idutilisateur1 AND friend_accepted = 1)
                                                 OR P.iduser IN (SELECT iduser FROM friend WHERE friend.idfriend = :idutilisateur2 AND friend_accepted = 1) )
                                 OR P.iduser = :idutilisateur)
-                                ORDER BY P.post_date DESC";
+                                ORDER BY P.post_date DESC
+                                LIMIT :limit OFFSET :offset";
                     $result = QueryPDO::getInstance()->query($requete, $tabParams);
                     if ($result != null) {
                         $i = 1;
