@@ -2,9 +2,10 @@
     require_once("../QueryPDO.php");
     session_start();
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "POST") {
-        if(is_null($idUser = QueryPDO::getInstance()->getIdByToken($_POST["token"]))) {
-            return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
-        }
+        if (isset($_SESSION['token'])) {
+            if(is_null($idUser = QueryPDO::getInstance()->getIdByToken($_SESSION["token"]))) {
+                return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
+            }
         else {
             if (isset($_POST['idComment'])) {
                 $tabParams[':idComment'] = $_POST['idComment'];
@@ -32,6 +33,8 @@
 
                     if($result->rowCount()!=NULL)
                         return QueryPDO::getInstance()->ServiceReturnJson("0","Ok");
+                    else
+                        return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
 
                 }
                 else
