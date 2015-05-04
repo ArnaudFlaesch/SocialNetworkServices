@@ -1,12 +1,12 @@
 <?php 
 require_once("QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
-
-  if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "GET") { // Verification de la methode de requete
-
-		if(isset($_GET["token"])){ // Verification de la présence des variables en paramètres
-
-			
-			if(is_null($IdUser = QueryPDO::getInstance()->getIdByToken($_GET["token"]))){ //Code 4, en cas de parametre: "token" inconnu
+session_start();
+  // Verification de la methode de requete
+if (isset($_SESSION['token'])) {
+                if(is_null($idUser = QueryPDO::getInstance()->getIdByToken($_SESSION["token"]))) {
+                    return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
+                }
+			if(is_null($IdUser = QueryPDO::getInstance()->getIdByToken($_SESSION["token"]))){ //Code 4, en cas de parametre: "token" inconnu
 				return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
 			}
 
@@ -35,7 +35,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					echo 'Page : ';
 					for ($i = 1 ; $i <= $nb_pages ; $i++)
 					{
-					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/finduser.php?token='.$_GET["token"].'&page=' . $i . '">' . $i . '</a> '; // en dur
+					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/finduser.php?token='.$_SESSION["token"].'&page=' . $i . '">' . $i . '</a> '; // en dur
 					}
  					echo "<br>";
 					// Maintenant, on va afficher les messages
@@ -96,92 +96,11 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 							}
 					   
 					}
-
-
-				/*	//-------------------------------- Pour la pagination -----------------------------------------
-					
-					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
-																INNER JOIN friend AS F ON U.iduser = F.iduser 
-																INNER JOIN user ON user.iduser = F.idfriend 
-																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
-																LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page);
-
-					if(is_object($reponse2)){
-						while($donnees = $reponse2->fetch()) 
-							{	
-								
-							    echo 'est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
-							}
-					   
-					}
-						
-					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
-																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
-																	INNER JOIN user ON user.iduser = F.iduser
-																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
-																	LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page
-																);
-					if(is_object($reponse3)){	 
-						while($donnees = $reponse3->fetch()) 
-							{
-								
-							    echo '<p> est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
-							}
-					}
-				
-					//-----------------------------------------------------------------------------------------------
-					//--------------------------------Pour la liste a renvoyer --------------------------------------
-					$jsontab = array();
-					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
-																INNER JOIN friend AS F ON U.iduser = F.iduser 
-																INNER JOIN user ON user.iduser = F.idfriend 
-																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
-																');
-
-					if(is_object($reponse2)){
-						while($donnees = $reponse2->fetch()) 
-							{	
-								array_push($jsontab, $donnees['user_login']);
-							  
-							}
-					   
-					}
-						
-					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
-																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
-																	INNER JOIN user ON user.iduser = F.iduser
-																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
-																	'
-																);
-					if(is_object($reponse3)){	 
-						while($donnees = $reponse3->fetch()) 
-							{
-								array_push($jsontab, $donnees['user_login']);
-							   
-							}
-					}
-					//-----------------------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------
-			//-------------------------------------------------------------------------
-
-			if(is_null($reponse2 && $reponse3)){ //Si on fait un insert, on verifie que la requete a inseré une ligne, si ce n'est pas le cas la ligne etait déjà présente : code 7
-				return QueryPDO::getInstance()->ServiceReturnJson("7","Nothing to update");
-			}
-			else{
-				return QueryPDO::getInstance()->ServiceReturnJson("0",json_encode($jsontab)); //Code 0: tout s'est bien passé. Ici pas de retour donc description
-			}*/
 			
 		}
-		else{
-
-			return QueryPDO::getInstance()->ServiceReturnJson("1","Missing parameters"); //code 2: Parametres manquants
-		}
-
-	}
-	else{
-
-		return QueryPDO::getInstance()->ServiceReturnJson("5","Wrong Request Methode"); // code 1: mauvaise methode de requete
-	}
+  else {
+        return QueryPDO::getInstance()->ServiceReturnJson("2","No token");
+ }
 
 
 ?>

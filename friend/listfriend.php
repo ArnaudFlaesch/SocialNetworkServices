@@ -1,21 +1,15 @@
 <?php 
 require_once("QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
 
-  if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "GET") { // Verification de la methode de requete
-
-		if(isset($_GET["token"])){ // Verification de la présence des variables en paramètres
-
-			
-			if(is_null($IdUser = QueryPDO::getInstance()->getIdByToken($_GET["token"]))){ //Code 4, en cas de parametre: "token" inconnu
-				return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
-			}
+$_SESSION["token"]="BdyFvZsFsqE11uopcHFZ";
+	if (isset($_SESSION['token'])) {
+                if(is_null($IdUser = QueryPDO::getInstance()->getIdByToken($_SESSION["token"]))) {
+                    return QueryPDO::getInstance()->ServiceReturnJson("4","Invalid Token");
+                }
 
 			//-------------------------------------------------------------------------
 			//------------------------------  CODE ------------------------------------
 			//------Il faut biensur changer les parametres en fonction du besoin-------
-
-
-
 			
 					$nombre_de_msg_par_page=10; // On met dans une variable le nombre de messages qu'on veut par page
 					 
@@ -35,7 +29,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					echo 'Page : ';
 					for ($i = 1 ; $i <= $nb_pages ; $i++)
 					{
-					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/listfriend.php?token='.$_GET["token"].'&page=' . $i . '">' . $i . '</a> '; // en dur
+					    echo '<a href="http://localhost/devweb/projet/SocialNetworkServices/friend/listfriend.php?token='.$_SESSION["token"].'&page=' . $i . '">' . $i . '</a> '; // en dur
 					}
  					echo "<br>";
 					// Maintenant, on va afficher les messages
@@ -62,14 +56,14 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
 																INNER JOIN friend AS F ON U.iduser = F.iduser 
 																INNER JOIN user ON user.iduser = F.idfriend 
-																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
+																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 1
 																LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page/2);
 
 					if(is_object($reponse2)){
 						while($donnees = $reponse2->fetch()) 
 							{	
 								
-							    echo 'est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
+							    echo ' amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
 							}
 					   
 					}
@@ -77,14 +71,14 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
 																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
 																	INNER JOIN user ON user.iduser = F.iduser
-																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
+																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 1 
 																	LIMIT ' . $premierMessageAafficher . ', ' . $nombre_de_msg_par_page/2
 																);
 					if(is_object($reponse3)){	 
 						while($donnees = $reponse3->fetch()) 
 							{
 								
-							    echo '<p> est amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
+							    echo '<p> amis avec :' . stripslashes(htmlspecialchars($donnees['user_login'])) . '</p>';
 							}
 					}
 				
@@ -94,7 +88,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					$reponse2 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
 																INNER JOIN friend AS F ON U.iduser = F.iduser 
 																INNER JOIN user ON user.iduser = F.idfriend 
-																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 0
+																WHERE F.iduser= '.$IdUser.' AND F.friend_accepted = 1
 																');
 
 					if(is_object($reponse2)){
@@ -109,7 +103,7 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 					    $reponse3 = QueryPDO::getInstance()->query('SELECT user.user_login FROM user AS U 
 																	INNER JOIN friend AS F ON U.iduser = F.idfriend 
 																	INNER JOIN user ON user.iduser = F.iduser
-																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 0 
+																	WHERE F.idfriend='.$IdUser.' AND F.friend_accepted = 1 
 																	'
 																);
 					if(is_object($reponse3)){	 
@@ -131,16 +125,10 @@ require_once("QueryPDO.php"); //Singleton connection bdd & communication + retur
 			}
 			
 		}
-		else{
+  else {
+        return QueryPDO::getInstance()->ServiceReturnJson("2","No token");
+ }
 
-			return QueryPDO::getInstance()->ServiceReturnJson("1","Missing parameters"); //code 2: Parametres manquants
-		}
-
-	}
-	else{
-
-		return QueryPDO::getInstance()->ServiceReturnJson("5","Wrong Request Methode"); // code 1: mauvaise methode de requete
-	}
 
 
 ?>
