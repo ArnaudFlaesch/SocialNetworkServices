@@ -1,5 +1,5 @@
 <?php 
-require_once("QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
+require_once("../QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
 
 $_SESSION["token"]="BdyFvZsFsqE11uopcHFZ";
 	if (isset($_SESSION['token'])) {

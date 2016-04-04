@@ -1,5 +1,5 @@
 <?php 
-require_once("QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
+require_once("../QueryPDO.php"); //Singleton connection bdd & communication + return en JSon
 session_start();
 
   if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "POST") { // Verification de la methode de requete
