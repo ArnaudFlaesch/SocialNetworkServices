@@ -25,7 +25,7 @@ class QueryPDO
   /**
    * Constante: hôte de la bdd
    */
-  const DEFAULT_SQL_PASS = '';
+  const DEFAULT_SQL_PASS = 'root';
  
   /**
    * Constante: nom de la bdd
